@@ -5,14 +5,16 @@ from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 
+
 class Cell(Button):
 
     def __init__(self, **kwargs):
         super(Cell, self).__init__(**kwargs)
         self.on_press = self.x_add
-    
+
     def x_add(self):
         self.text = "X"
+
 
 class Field(GridLayout):
 
@@ -39,38 +41,41 @@ class Field(GridLayout):
         self.add_widget(self.bt_2_1)
         self.add_widget(self.bt_2_2)
 
+
 class Score_bar(BoxLayout):
 
     def __init__(self, **kwargs):
         super(Score_bar, self).__init__(**kwargs)
         self.size_hint = (1, .10)
         self.add_widget(Label(
-            text = "Player X",
-            halign = "left",
-            size_hint = (.5, 1),
-            font_size = 30)
-        )
+            text="Player X",
+            halign="left",
+            size_hint=(.5, 1),
+            font_size=30)
+            )
         self.add_widget(Label(
-            text = "2:1",
-            font_size = 30)
-        )
+            text="2:1",
+            font_size=30)
+            )
         self.add_widget(Label(
-            text = "Player O",
-            halign = "left",
-            size_hint = (.5, 1),
-            font_size = 30)
-        )
+            text="Player O",
+            halign="left",
+            size_hint=(.5, 1),
+            font_size=30)
+            )
+
 
 class TickTackToeApp(App):
 
     def build(self):
         bl_1 = BoxLayout(
-            orientation = 'vertical',
-            padding = 25
-        )
-        bl_1.add_widget( Score_bar() )
-        bl_1.add_widget( Field() )
+            orientation='vertical',
+            padding=25
+            )
+        bl_1.add_widget(Score_bar())
+        bl_1.add_widget(Field())
         return bl_1
+
 
 if __name__ == "__main__":
     TickTackToeApp().run()
