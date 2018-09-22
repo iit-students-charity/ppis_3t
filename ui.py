@@ -30,6 +30,8 @@ class Cell(Button):
 
     def __init__(self):
         super(Cell, self).__init__()
+        pos_x = 0
+        pos_y = 0
         self.on_press = self.x_add
         self.font_size = 50
         self.background_color = [.20, .24, .33, 1]
@@ -37,7 +39,7 @@ class Cell(Button):
         self.background_down = ""
 
     def x_add(self):
-        self.text = "X"
+        self.text = str(self.pos_x) + str(self.pos_y)
 
 
 class Field(GridLayout):
@@ -48,24 +50,14 @@ class Field(GridLayout):
         self.spacing = 5
         self.size_hint = (.72, .95)
         self.halign = "center"
-        self.bt_0_0 = Cell()
-        self.bt_0_1 = Cell()
-        self.bt_0_2 = Cell()
-        self.bt_1_0 = Cell()
-        self.bt_1_1 = Cell()
-        self.bt_1_2 = Cell()
-        self.bt_2_0 = Cell()
-        self.bt_2_1 = Cell()
-        self.bt_2_2 = Cell()
-        self.add_widget(self.bt_0_0)
-        self.add_widget(self.bt_0_1)
-        self.add_widget(self.bt_0_2)
-        self.add_widget(self.bt_1_0)
-        self.add_widget(self.bt_1_1)
-        self.add_widget(self.bt_1_2)
-        self.add_widget(self.bt_2_0)
-        self.add_widget(self.bt_2_1)
-        self.add_widget(self.bt_2_2)
+        for y in range(3):
+            for x in range(3):
+                self.bt = Cell()
+                self.bt.pos_x = x
+                self.bt.pos_y = y
+                self.add_widget(self.bt)
+                
+
         with self.canvas.before:
             Color(1, 1, 1, 1)
             self.rect = Rectangle(
