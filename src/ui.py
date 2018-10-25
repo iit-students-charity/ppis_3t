@@ -10,7 +10,6 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 
 from kivy.lang import Builder
-import numpy as np
 
 
 Builder.load_string("""
@@ -68,7 +67,7 @@ class Cell(Button):
 
 class Field(GridLayout):
     switcher = 0
-    cols = 5
+    cols = 3
     table = []
 
     def __init__(self, **kwargs):
@@ -114,22 +113,6 @@ class Win_cond():
     def result(self, winner):
         print(winner)
 
-    def vertical(self, table):
-        table = np.transpose(table)
-
-        for a in range(len(table)):
-            if None not in table[a]:
-                vertical_sum = 0
-                for b in range(len(table)):
-                    vertical_sum += table[a][b]
-
-                if vertical_sum == 5:
-                    self.result('x')
-
-                if vertical_sum == 0:
-                    self.result('o')
-
-
     def win(self, table):
         for a in range(len(table)):
             if None not in table[a]:
@@ -137,16 +120,68 @@ class Win_cond():
                 for b in range(len(table)):
                     horizont_sum += table[a][b]
 
-                if horizont_sum == 5:
+                if horizont_sum == len(table):
                     self.result('x')
+                    break
+
+                elif horizont_sum == 0:
+                    self.result('o')
+                    break
+        self.vertical(table)
+
+    def vertical(self, table):
+        table_transp = list(zip(*table))
+
+        for a in range(len(table_transp)):
+            if None not in table_transp[a]:
+                horizont_sum = 0
+                for b in range(len(table_transp)):
+                    horizont_sum += table_transp[a][b]
+
+                if horizont_sum == len(table_transp):
+                    self.result('x')
+                    break
 
                 if horizont_sum == 0:
                     self.result('o')
+                    break
+        self.diagonal_right(table)
 
-            else:
-                self.vertical(table)
+    def diagonal_right(self, table):
+        diagonal_right_sum = 0
+        count = 0
+        for a in range (len(table)):
+            if None != table[a][a]:
+                count += 1
+        if count == len(table):
+            for a in range (len(table)):
+                if None != table[a][a]:
+                    diagonal_right_sum += table[a][a]
 
+            if diagonal_right_sum == len(table):
+                self.result('x')
+                
+            if diagonal_right_sum == 0:
+                self.result('o')
+        self.diagonal_left(table)
 
+    def diagonal_left(self, table):
+        diagonal_left_sum = 0
+        count = 0
+        for a in range (len(table) - 1, -1, -1):
+            if None != table[len(table) - 1 - a][a]:
+                count += 1
+        if count == len(table):
+            for a in range (len(table)):
+                if None != table[len(table) - 1 - a][a]:
+                    diagonal_left_sum += table[len(table) - 1 - a][a]
+
+            if diagonal_left_sum == len(table):
+                self.result('x')
+                
+            if diagonal_left_sum == 0:
+                self.result('o')
+               
 
 class Score_bar(BoxLayout):
 
