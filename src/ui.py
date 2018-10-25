@@ -2,11 +2,37 @@ from kivy.app import App
 from kivy.config import Config
 from kivy.graphics import Color, Rectangle
 from kivy.uix.button import Button
+from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
+
+from kivy.lang import Builder
+import numpy as np
+
+
+Builder.load_string("""
+<MenuScreen>:
+    Button:
+        text: 'PLAY'
+        on_press: root.manager.current = 'gw'
+        font_size: 50
+        background_color: [.20, .24, .33, 1]
+        background_normal: ""
+        background_down: ""
+
+<GW>:
+    Game_Window:
+""")
+
+# Declare both screens
+class MenuScreen(Screen):
+    pass
+
+class GW(Screen):
+    pass
 
 
 Config.set(
@@ -31,30 +57,33 @@ class Cell(Button):
     pos_y = 0
     blocked = False
 
-    def __init__(self, pos_x = 0, pos_y = 0):
+    def __init__(self, p_x, p_y):
         super(Cell, self).__init__()
         self.font_size = 50
+        self.pos_x = p_x
+        self.pos_y = p_y
         self.background_color = [.20, .24, .33, 1]
         self.background_normal = ""
         self.background_down = ""
 
 class Field(GridLayout):
     switcher = 0
-    cols = 3
-    lines = 3
+    cols = 5
+    table = []
 
     def __init__(self, **kwargs):
         super(Field, self).__init__(**kwargs)
-        self.cols = self.cols
         self.spacing = 5
         self.size_hint = (.72, .95)
         self.halign = "center"
 
         for x in range(self.cols):
-            for y in range(self.lines):
+            self.table.append([])
+            for y in range(self.cols):
                 self.bt = Cell(x, y)
                 self.bt.bind(on_press = self.switch)
                 self.add_widget(self.bt)
+                self.table[x].append(None)
 
         with self.canvas.before:
             Color(1, 1, 1, 1)
@@ -69,11 +98,54 @@ class Field(GridLayout):
                 instance.text = "X"
                 instance.color = [.41, .53, .64, 1]
                 self.switcher = 1
+                self.table[instance.pos_x][instance.pos_y] = 1
+                
             else:
                 instance.text = "O"
                 instance.color = [.95, .54, .57, 1]
                 self.switcher = 0
+                self.table[instance.pos_x][instance.pos_y] = 0
             instance.blocked = True
+        wc = Win_cond()
+        wc.win(self.table)
+            
+
+class Win_cond():
+    def result(self, winner):
+        print(winner)
+
+    def vertical(self, table):
+        table = np.transpose(table)
+
+        for a in range(len(table)):
+            if None not in table[a]:
+                vertical_sum = 0
+                for b in range(len(table)):
+                    vertical_sum += table[a][b]
+
+                if vertical_sum == 5:
+                    self.result('x')
+
+                if vertical_sum == 0:
+                    self.result('o')
+
+
+    def win(self, table):
+        for a in range(len(table)):
+            if None not in table[a]:
+                horizont_sum = 0
+                for b in range(len(table)):
+                    horizont_sum += table[a][b]
+
+                if horizont_sum == 5:
+                    self.result('x')
+
+                if horizont_sum == 0:
+                    self.result('o')
+
+            else:
+                self.vertical(table)
+
 
 
 class Score_bar(BoxLayout):
@@ -149,10 +221,12 @@ class Game_Window(BoxLayout):
 class TickTackToeApp(App):
 
     def build(self):
-        game_win = Game_Window()
+        sm = ScreenManager()
+        sm.add_widget(MenuScreen(name='menu'))
+        sm.add_widget(GW(name='gw'))
         self.icon = 'image/icon.png'
         self.title = 'Tic-Tac-Toe'
-        return game_win
+        return sm
 
 
 if __name__ == "__main__":
