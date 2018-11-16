@@ -1,0 +1,61 @@
+#:kivy 1.8.0
+
+<ScreenManagement>
+    MenuScreen:
+    GameScreen:
+
+<MenuScreen>
+    name: 'ms'
+    Button:
+        text: 'PLAY'
+        on_press: root.manager.current = 'gs'
+        font_size: 50
+        background_color: [.20, .24, .33, 1]
+        background_normal: ""
+        background_down: ""
+
+<Game>
+    padding: 25
+    orientation: "vertical"
+   
+<GameScreen>
+    name: 'gs'
+    canvas:
+        Color:
+            rgb: (.20, .24, .33)
+        Rectangle:
+            size: (800, 600)
+            pos: (0, 0)
+    Widget:
+        canvas:
+            Color:
+                rgb: (1, 1, 1)
+            Rectangle:
+                size: (510, 451)
+                pos: (145, 61)
+    Game:
+                
+<Field>
+    size_hint: (.68, .95)
+    spacing: 5
+
+<Label_x>
+    halign: "right"
+    text_size: (230, 40)
+    font_size: 30
+    color: [.40, .52, .63, 1]   
+
+<Label_y>
+    halign: "left"
+    text_size: (230, 40)
+    font_size: 30
+    color: [.95, .54, .57, 1]
+
+<ScoreBar>
+    size_hint: (1, .1)
+
+<Cell>
+    font_size: 50
+    background_color: [.20, .24, .33, 1]
+    background_normal: ""
+    background_down: ""
