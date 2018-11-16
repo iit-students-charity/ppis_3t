@@ -12,6 +12,19 @@ from kivy.uix.gridlayout import GridLayout
 
 from functools import partial
 
+import mysql.connector 
+
+playersdb = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    passwd="root",
+    database="playersdatabase"
+)
+
+players = playersdb.cursor()
+
+players.execute("CREATE TABLE users (name VARCHAR(255), wins INT)")
+
 Config.read('3t.cfg')
 
 
