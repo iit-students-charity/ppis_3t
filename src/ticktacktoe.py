@@ -16,20 +16,6 @@ from functools import partial
 
 import mysql.connector 
 
-playersdb = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    passwd="root",
-    database="playersdatabase"
-)
-
-players = playersdb.cursor()
-
-players.execute("CREATE TABLE users (name VARCHAR(255), wins INT)")
-
-Config.read('3t.cfg')
-
-
 class Cell(Button):
     pos_x = 0
     pos_y = 0
@@ -235,12 +221,14 @@ class Game(BoxLayout):
     def input_x(self, fl_g, fl, lb_x, lb_y, bl_bott, bt, ti, name_x, name_o):
         self.name_x = ti.text
         ti.text = "O's name"
+        RecordPlayers().db_connect(self.name_x, lb_x.score)
         print(self.name_x)
         bt.on_press = partial(self.input_o, fl_g, fl, lb_x, lb_y, bl_bott, bt, ti, self.name_o)
         return
 
     def input_o(self, fl_g, fl, lb_x, lb_y, bl_bott, bt, ti, name_o):
         self.name_o = ti.text
+        RecordPlayers().db_connect(self.name_o, lb_y.score)
         print(self.name_o)
         bt_cls = BtCls()
         bt_cls.on_press = partial(self.clear_screen, bl_bott, fl_g, lb_x, lb_y)
@@ -248,6 +236,24 @@ class Game(BoxLayout):
         bl_bott.add_widget(bt_cls)
         return
 
+class RecordPlayers():
+    def db_connect(self, name, score):
+        playersdb = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            passwd="root",
+            database="playersdatabase"
+        )
+
+        players = playersdb.cursor()
+
+        sql = "INSERT INTO users (name, wins) VALUES (%s, %s)"
+        val = (name, score)
+        players.execute(sql, val)
+
+        playersdb.commit()
+
+        print(players.rowcount, "record inserted.")
 
 class TextInputer(TextInput):
     pass
