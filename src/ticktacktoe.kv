@@ -17,7 +17,24 @@
 <Game>
     padding: 25
     orientation: "vertical"
-   
+
+<BtCls>
+    text: 'END GAME'
+    background_color: [.20, .24, .33, 1]
+    background_normal: ""
+    background_down: ""
+
+<EnterBt>
+    text: 'SEND'
+    background_color: [.20, .24, .33, 1]
+    background_normal: ""
+    background_down: ""
+
+<TextInputer>
+    text: "X's name"
+    multiline: False
+    background_color: [.40, .44, .53, 1]
+
 <GameScreen>
     name: 'gs'
     canvas:
@@ -31,12 +48,12 @@
             Color:
                 rgb: (1, 1, 1)
             Rectangle:
-                size: (510, 451)
-                pos: (145, 61)
+                size: (448, 427)
+                pos: (175, 85)
     Game:
                 
 <Field>
-    size_hint: (.68, .95)
+    size_hint: (.60, .88)
     spacing: 5
 
 <Label_x>
@@ -52,7 +69,7 @@
     color: [.95, .54, .57, 1]
 
 <ScoreBar>
-    size_hint: (1, .1)
+    size_hint: (1, .05)
 
 <Cell>
     font_size: 50

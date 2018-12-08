@@ -3,10 +3,12 @@ from kivy.app import App
 from kivy.config import Config
 from kivy.graphics import Color, Rectangle
 from kivy.uix.button import Button
+from kivy.uix.textinput import TextInput
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.anchorlayout import AnchorLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 
@@ -80,6 +82,7 @@ class WinCond():
     def diagonal_left(self, table):
         diagonal_left_sum = 0
         count = 0
+        is_pat = 0
         for a in range(len(table) - 1, -1, -1):
             if table[len(table) - 1 - a][a] is not None:
                 count += 1
@@ -93,6 +96,12 @@ class WinCond():
 
             if diagonal_left_sum == 0:
                 self.winner = 'o'
+        for a in range(len(table)):
+            for b in range(len(table)):
+                if table[a][b] is not None:
+                    is_pat += 1
+        if is_pat == len(table)**2:
+            self.winner = 'n'
 
 
 class ScoreBar(BoxLayout):
@@ -101,7 +110,7 @@ class ScoreBar(BoxLayout):
 
 class Field(GridLayout):
     switcher = 0
-    cols = 5
+    cols = 3
     table = []
     wc = WinCond()
 
@@ -114,9 +123,18 @@ class Label_y(Label):
     score = 0
 
 
+class Text_Input(TextInput):
+    pass
+
 class Game(BoxLayout):
+    name_x = ""
+    name_o = ""
+
     def __init__(self, **kwargs):
         super(Game, self).__init__()
+        bl_top = BoxLayout(orientation = 'vertical', size_hint = (1, .95))
+        bl_bott = BoxLayout(orientation = 'horizontal', size_hint = (1, .05))
+
         lb_x = Label_x()
         lb_x.text = str(0)
         lb_y = Label_y()
@@ -127,8 +145,17 @@ class Game(BoxLayout):
         fl_g = Field()
         al = AnchorLayout()
         al.add_widget(fl_g)
-        self.add_widget(sb_g)
-        self.add_widget(al)
+
+        bl_top.add_widget(sb_g)
+        bl_top.add_widget(al)
+
+        bt_cls = BtCls()
+        bt_cls.on_press = partial(self.clear_screen, fl_g, bl_bott, fl_g, lb_x, lb_y)
+
+        bl_bott.add_widget(bt_cls)
+
+        self.add_widget(bl_top)
+        self.add_widget(bl_bott)
         for x in range(fl_g.cols):
             fl_g.table.append([])
             for y in range(fl_g.cols):
@@ -154,21 +181,69 @@ class Game(BoxLayout):
         if fl.wc.winner == 'x':
             lb_x.score += 1
             lb_x.text = str(lb_x.score)
-            self.clear_screen(fl)
+            self.clear_field(fl)
         elif fl.wc.winner == 'o':
             lb_y.score += 1
             lb_y.text = str(lb_y.score)
-            self.clear_screen(fl)
+            self.clear_field(fl)
+        elif fl.wc.winner == 'n':
+            self.clear_field(fl)
+        
         fl.wc.winner = ''
 
-    def clear_screen(self, fl):
+    def clear_field(self, fl):
+        for el in fl.children:
+            el.text = ''
+            el.blocked = False
+        for i in range(fl.cols):
+            for j in range(fl.cols):
+                fl.table[i][j] = None        
+        return
+
+    def clear_screen(self, fl_g, bl_bott, fl, lb_x, lb_y):
         for el in fl.children:
             el.text = ''
             el.blocked = False
         for i in range(fl.cols):
             for j in range(fl.cols):
                 fl.table[i][j] = None
+
+        lb_x.text = str(0)
+        lb_y.text = str(0)
+
+        bl_bott.clear_widgets()
+        ti = TextInputer()
+        bt = EnterBt()
+        bt.on_press = partial(self.input_x, fl_g, fl, lb_x, lb_y, bl_bott, bt, ti, self.name_x, self.name_o)
+        bl_bott.add_widget(ti)
+        bl_bott.add_widget(bt)
         return
+
+    def input_x(self, fl_g, fl, lb_x, lb_y, bl_bott, bt, ti, name_x, name_o):
+        self.name_x = ti.text
+        ti.text = "O's name"
+        print(self.name_x)
+        bt.on_press = partial(self.input_o, fl_g, fl, lb_x, lb_y, bl_bott, bt, ti, self.name_o)
+        return
+
+    def input_o(self, fl_g, fl, lb_x, lb_y, bl_bott, bt, ti, name_o):
+        self.name_o = ti.text
+        print(self.name_o)
+        bt_cls = BtCls()
+        bt_cls.on_press = partial(self.clear_screen, bl_bott, fl_g, lb_x, lb_y)
+        bl_bott.clear_widgets()
+        bl_bott.add_widget(bt_cls)
+        return
+
+
+class TextInputer(TextInput):
+    pass
+
+class BtCls(Button):
+    pass
+
+class EnterBt(Button):
+    pass
 
 
 class MenuScreen(Screen):
