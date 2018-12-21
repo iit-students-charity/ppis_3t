@@ -13,8 +13,10 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 
 from functools import partial
+from IPython import embed
 
-import mysql.connector 
+import mysql.connector
+import random
 
 class Cell(Button):
     pos_x = 0
@@ -31,6 +33,7 @@ class WinCond():
     winner = ''
 
     def win(self, table):
+        embed()
         for a in range(len(table)):
             if None not in table[a]:
                 horizont_sum = 0
@@ -43,6 +46,7 @@ class WinCond():
                 elif horizont_sum == 0:
                     self.winner = 'o'
         self.vertical(table)
+        self.random_place(table)
 
     def vertical(self, table):
         table_transp = list(zip(*table))
@@ -101,6 +105,15 @@ class WinCond():
                     is_pat += 1
         if is_pat == len(table)**2:
             self.winner = 'n'
+
+    def random_place(self, table):
+        embed()
+        x = random.randint(0, 2)
+        y = random.randint(0, 2)
+        if table[x][y] is None:
+            self.random_place(table)
+        else:
+            table[x][y] = 0
 
 
 class ScoreBar(BoxLayout):
@@ -187,7 +200,7 @@ class Game(BoxLayout):
             self.clear_field(fl)
         elif fl.wc.winner == 'n':
             self.clear_field(fl)
-        
+
         fl.wc.winner = ''
 
     def clear_field(self, fl):
@@ -196,7 +209,7 @@ class Game(BoxLayout):
             el.blocked = False
         for i in range(fl.cols):
             for j in range(fl.cols):
-                fl.table[i][j] = None        
+                fl.table[i][j] = None
         return
 
     def clear_screen(self, fl_g, bl_bott, fl, lb_x, lb_y):
