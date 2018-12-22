@@ -13,6 +13,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 
 from functools import partial
+import random
 
 Config.read('3t.cfg')
 
@@ -112,6 +113,7 @@ class Field(GridLayout):
     switcher = 0
     cols = 3
     table = []
+    buttons = []
     wc = WinCond()
 
 
@@ -127,6 +129,7 @@ class Text_Input(TextInput):
     pass
 
 class Game(BoxLayout):
+    mode = "bot"
     name_x = ""
     name_o = ""
 
@@ -163,20 +166,52 @@ class Game(BoxLayout):
                 bt.on_press = partial(self.callback, bt, fl_g, lb_x, lb_y)
                 fl_g.add_widget(bt)
                 fl_g.table[x].append(None)
+                fl_g.buttons.append(bt)
+                
 
     def callback(self, bt, fl, lb_x, lb_y):
-        if not bt.blocked:
-            if fl.switcher == 0:
+        if self.mode == "bot":
+            if not bt.blocked:
                 bt.text = "X"
                 bt.color = [.41, .53, .64, 1]
                 fl.switcher = 1
                 fl.table[bt.pos_x][bt.pos_y] = 1
-            else:
-                bt.text = "O"
-                bt.color = [.95, .54, .57, 1]
+                bt.blocked = True
+
+                bot_x = bt.pos_x + 1
+                bot_y = bt.pos_y + 1
+                
+                rand_btn = Cell(-1, -1)
+                rand_btn.blocked = True
+                while rand_btn.blocked == True:
+                    random.seed()
+                    bot_x = random.randint(0, fl.cols - 1)
+                    random.seed()
+                    bot_y = random.randint(0, fl.cols - 1)
+                    for x in range(fl.cols*fl.cols):
+                        if bot_x == fl.buttons[x].pos_x and bot_y == fl.buttons[x].pos_y:
+                            rand_btn = fl.buttons[x]
+
+                rand_btn.text = "O"
+                rand_btn.color = [.95, .54, .57, 1]
+                rand_btn.blocked = True
                 fl.switcher = 0
                 fl.table[bt.pos_x][bt.pos_y] = 0
-            bt.blocked = True
+
+        elif self.mode == "pvp":
+            if not bt.blocked:
+                if fl.switcher == 0:
+                    bt.text = "X"
+                    bt.color = [.41, .53, .64, 1]
+                    fl.switcher = 1
+                    fl.table[bt.pos_x][bt.pos_y] = 1
+                else:
+                    bt.text = "O"
+                    bt.color = [.95, .54, .57, 1]
+                    fl.switcher = 0
+                    fl.table[bt.pos_x][bt.pos_y] = 0
+                bt.blocked = True
+        
         fl.wc.win(fl.table)
         if fl.wc.winner == 'x':
             lb_x.score += 1
@@ -188,7 +223,6 @@ class Game(BoxLayout):
             self.clear_field(fl)
         elif fl.wc.winner == 'n':
             self.clear_field(fl)
-        
         fl.wc.winner = ''
 
     def clear_field(self, fl):
@@ -243,10 +277,6 @@ class BtCls(Button):
     pass
 
 class EnterBt(Button):
-    pass
-
-
-class MenuScreen(Screen):
     pass
 
 
