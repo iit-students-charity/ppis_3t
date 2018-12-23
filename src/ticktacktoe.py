@@ -196,7 +196,7 @@ class Game(BoxLayout):
                 rand_btn.color = [.95, .54, .57, 1]
                 rand_btn.blocked = True
                 fl.switcher = 0
-                fl.table[bt.pos_x][bt.pos_y] = 0
+                fl.table[rand_btn.pos_x][rand_btn.pos_y] = 0
 
         elif self.mode == "pvp":
             if not bt.blocked:
