@@ -14,6 +14,7 @@ from kivy.uix.gridlayout import GridLayout
 
 from functools import partial
 import random
+import mysql.connector 
 
 Config.read('3t.cfg')
 
@@ -288,12 +289,14 @@ class Game(BoxLayout):
     def input_x(self, fl, lb_x, lb_y, bl_bott, bt, ti, name_x, name_o):
         self.name_x = ti.text
         ti.text = "O's name"
+        RecordPlayers().db_connect(self.name_x, lb_x.score)
         print(self.name_x)
         bt.on_press = partial(self.input_o, fl, lb_x, lb_y, bl_bott, bt, ti, self.name_o)
         return
 
     def input_o(self, fl, lb_x, lb_y, bl_bott, bt, ti, name_o):
         self.name_o = ti.text
+        RecordPlayers().db_connect(self.name_o, lb_y.score)
         print(self.name_o)
         bl_bott.clear_widgets()
 
@@ -309,6 +312,24 @@ class Game(BoxLayout):
         bl_bott.add_widget(bt_cls)
         return
 
+class RecordPlayers():
+    def db_connect(self, name, score):
+        playersdb = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            passwd="root",
+            database="playersdatabase"
+        )
+
+        players = playersdb.cursor()
+
+        sql = "INSERT INTO users (name, wins) VALUES (%s, %s)"
+        val = (name, score)
+        players.execute(sql, val)
+
+        playersdb.commit()
+
+        print(players.rowcount, "record inserted.")
 
 class TextInputer(TextInput):
     pass
