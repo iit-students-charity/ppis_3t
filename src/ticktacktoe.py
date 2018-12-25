@@ -3,6 +3,7 @@ from kivy.app import App
 from kivy.config import Config
 from kivy.graphics import Color, Rectangle
 from kivy.uix.button import Button
+from kivy.uix.slider import Slider
 from kivy.uix.textinput import TextInput
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.widget import Widget
@@ -153,6 +154,10 @@ class Game(BoxLayout):
         bl_top.add_widget(sb_g)
         bl_top.add_widget(al)
 
+        bt_field = UIBt()
+        bt_field.text = str(fl_g.cols)
+        bt_field.on_press = partial(self.change_field, bt_field, fl_g, lb_x, lb_y)
+
         bt_mode = UIBt()
         bt_mode.text = "BOT VS PLAYER"
         bt_mode.on_press = partial(self.change_mode, bt_mode)
@@ -161,6 +166,7 @@ class Game(BoxLayout):
         bt_cls.text = 'END GAME'
         bt_cls.on_press = partial(self.clear_screen, bl_bott, fl_g, lb_x, lb_y)
 
+        bl_bott.add_widget(bt_field)
         bl_bott.add_widget(bt_mode)
         bl_bott.add_widget(bt_cls)
 
@@ -277,6 +283,29 @@ class Game(BoxLayout):
             bl_bott.add_widget(bt)
         return
 
+    def change_field(self, bt, fl, lb_x, lb_y):
+        self.children[1].children[0].clear_widgets()
+        fl.children = []
+        fl.cols += 1
+        if fl.cols == 7:
+            fl.cols = 3
+        bt.text = str(fl.cols)
+
+        for x in range(fl.cols):
+            #fl.table.append([])
+            for y in range(fl.cols):
+                bt = Cell(x, y)
+                bt.on_press = partial(self.callback, bt, fl, lb_x, lb_y)
+                fl.add_widget(bt)
+                #fl.table[x].append(None)
+                #fl.buttons.append(bt)
+            
+        
+
+        
+
+        
+
     def change_mode(self, bt):
         if self.mode == "bot":
             self.mode = "pvp"
@@ -312,6 +341,7 @@ class Game(BoxLayout):
         bl_bott.add_widget(bt_cls)
         return
 
+
 class RecordPlayers():
     def db_connect(self, name, score):
         playersdb = mysql.connector.connect(
@@ -338,6 +368,8 @@ class TextInputer(TextInput):
 class UIBt(Button):
     pass
 
+class UISlider(Slider):
+    pass
 
 class EnterBt(Button):
     pass
