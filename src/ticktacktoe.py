@@ -4,6 +4,7 @@ from kivy.config import Config
 from kivy.graphics import Color, Rectangle
 from kivy.uix.slider import Slider
 from kivy.uix.button import Button
+from kivy.uix.slider import Slider
 from kivy.uix.textinput import TextInput
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.widget import Widget
@@ -15,6 +16,7 @@ from kivy.uix.gridlayout import GridLayout
 
 from functools import partial
 import random
+import mysql.connector 
 
 Config.read('3t.cfg')
 
@@ -301,7 +303,6 @@ class Game(BoxLayout):
                 fl.table[x].append(None)
                 fl.buttons.append(bt)
 
-
     def change_mode(self, bt):
         if self.mode == "bot":
             self.mode = "pvp"
@@ -314,12 +315,14 @@ class Game(BoxLayout):
     def input_x(self, fl, lb_x, lb_y, bl_bott, bt, ti, name_x, name_o):
         self.name_x = ti.text
         ti.text = "O's name"
+        RecordPlayers().db_connect(self.name_x, lb_x.score)
         print(self.name_x)
         bt.on_press = partial(self.input_o, fl, lb_x, lb_y, bl_bott, bt, ti, self.name_o)
         return
 
     def input_o(self, fl, lb_x, lb_y, bl_bott, bt, ti, name_o):
         self.name_o = ti.text
+        RecordPlayers().db_connect(self.name_o, lb_y.score)
         print(self.name_o)
         bl_bott.clear_widgets()
 
@@ -336,6 +339,25 @@ class Game(BoxLayout):
         return
 
 
+class RecordPlayers():
+    def db_connect(self, name, score):
+        playersdb = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            passwd="root",
+            database="playersdatabase"
+        )
+
+        players = playersdb.cursor()
+
+        sql = "INSERT INTO users (name, wins) VALUES (%s, %s)"
+        val = (name, score)
+        players.execute(sql, val)
+
+        playersdb.commit()
+
+        print(players.rowcount, "record inserted.")
+
 class TextInputer(TextInput):
     pass
 
@@ -347,6 +369,8 @@ class UISlider(Slider):
 class UIBt(Button):
     pass
 
+class UISlider(Slider):
+    pass
 
 class EnterBt(Button):
     pass
