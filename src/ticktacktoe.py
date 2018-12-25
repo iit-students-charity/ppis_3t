@@ -13,8 +13,10 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 
 from functools import partial
-
+import random
 import mysql.connector 
+
+Config.read('3t.cfg')
 
 class Cell(Button):
     pos_x = 0
@@ -111,6 +113,7 @@ class Field(GridLayout):
     switcher = 0
     cols = 3
     table = []
+    buttons = []
     wc = WinCond()
 
 
@@ -125,7 +128,9 @@ class Label_y(Label):
 class Text_Input(TextInput):
     pass
 
+
 class Game(BoxLayout):
+    mode = "bot"
     name_x = ""
     name_o = ""
 
@@ -148,9 +153,15 @@ class Game(BoxLayout):
         bl_top.add_widget(sb_g)
         bl_top.add_widget(al)
 
-        bt_cls = BtCls()
-        bt_cls.on_press = partial(self.clear_screen, fl_g, bl_bott, fl_g, lb_x, lb_y)
+        bt_mode = UIBt()
+        bt_mode.text = "BOT VS PLAYER"
+        bt_mode.on_press = partial(self.change_mode, bt_mode)
 
+        bt_cls = UIBt()
+        bt_cls.text = 'END GAME'
+        bt_cls.on_press = partial(self.clear_screen, bl_bott, fl_g, lb_x, lb_y)
+
+        bl_bott.add_widget(bt_mode)
         bl_bott.add_widget(bt_cls)
 
         self.add_widget(bl_top)
@@ -162,33 +173,80 @@ class Game(BoxLayout):
                 bt.on_press = partial(self.callback, bt, fl_g, lb_x, lb_y)
                 fl_g.add_widget(bt)
                 fl_g.table[x].append(None)
+                fl_g.buttons.append(bt)
+                
 
     def callback(self, bt, fl, lb_x, lb_y):
-        if not bt.blocked:
-            if fl.switcher == 0:
+        if self.mode == "pvp":
+            if not bt.blocked:
+                if fl.switcher == 0:
+                    bt.text = "X"
+                    bt.color = [.41, .53, .64, 1]
+                    fl.switcher = 1
+                    fl.table[bt.pos_x][bt.pos_y] = 1
+                elif fl.switcher == 1:
+                    bt.text = "O"
+                    bt.color = [.95, .54, .57, 1]
+                    fl.switcher = 0
+                    fl.table[bt.pos_x][bt.pos_y] = 0
+                bt.blocked = True 
+                fl.wc.win(fl.table)     
+                if fl.wc.winner == 'x':
+                    lb_x.score += 1
+                    lb_x.text = str(lb_x.score)
+                    self.clear_field(fl)
+                elif fl.wc.winner == 'o':
+                    lb_y.score += 1
+                    lb_y.text = str(lb_y.score)
+                    self.clear_field(fl)
+                elif fl.wc.winner == 'n':
+                    self.clear_field(fl)
+                fl.wc.winner = ''
+
+        if self.mode == "bot":
+            if not bt.blocked:
                 bt.text = "X"
                 bt.color = [.41, .53, .64, 1]
                 fl.switcher = 1
                 fl.table[bt.pos_x][bt.pos_y] = 1
-            else:
-                bt.text = "O"
-                bt.color = [.95, .54, .57, 1]
-                fl.switcher = 0
-                fl.table[bt.pos_x][bt.pos_y] = 0
-            bt.blocked = True
-        fl.wc.win(fl.table)
-        if fl.wc.winner == 'x':
-            lb_x.score += 1
-            lb_x.text = str(lb_x.score)
-            self.clear_field(fl)
-        elif fl.wc.winner == 'o':
-            lb_y.score += 1
-            lb_y.text = str(lb_y.score)
-            self.clear_field(fl)
-        elif fl.wc.winner == 'n':
-            self.clear_field(fl)
-        
-        fl.wc.winner = ''
+                bt.blocked = True
+
+                fl.wc.win(fl.table)
+                if fl.wc.winner == 'x':
+                    lb_x.score += 1
+                    lb_x.text = str(lb_x.score)
+                    self.clear_field(fl)
+                    fl.wc.winner = ''
+                elif fl.wc.winner == 'n':
+                    self.clear_field(fl)
+                    fl.wc.winner = ''
+                else: 
+                    bot_x = bt.pos_x + 1
+                    bot_y = bt.pos_y + 1
+                    
+                    rand_btn = Cell(-1, -1)
+                    rand_btn.blocked = True
+                    while rand_btn.blocked == True:
+                        random.seed()
+                        bot_x = random.randint(0, fl.cols - 1)
+                        random.seed()
+                        bot_y = random.randint(0, fl.cols - 1)
+                        for x in range(fl.cols*fl.cols):
+                            if bot_x == fl.buttons[x].pos_x and bot_y == fl.buttons[x].pos_y:
+                                rand_btn = fl.buttons[x]
+
+                    rand_btn.text = "O"
+                    rand_btn.color = [.95, .54, .57, 1]
+                    rand_btn.blocked = True
+                    fl.switcher = 0
+                    fl.table[rand_btn.pos_x][rand_btn.pos_y] = 0
+
+                    fl.wc.win(fl.table)
+                    if fl.wc.winner == 'o':
+                        lb_y.score += 1
+                        lb_y.text = str(lb_y.score)
+                        self.clear_field(fl)
+                        fl.wc.winner = ''     
 
     def clear_field(self, fl):
         for el in fl.children:
@@ -199,7 +257,7 @@ class Game(BoxLayout):
                 fl.table[i][j] = None        
         return
 
-    def clear_screen(self, fl_g, bl_bott, fl, lb_x, lb_y):
+    def clear_screen(self, bl_bott, fl, lb_x, lb_y):
         for el in fl.children:
             el.text = ''
             el.blocked = False
@@ -210,29 +268,47 @@ class Game(BoxLayout):
         lb_x.text = str(0)
         lb_y.text = str(0)
 
-        bl_bott.clear_widgets()
-        ti = TextInputer()
-        bt = EnterBt()
-        bt.on_press = partial(self.input_x, fl_g, fl, lb_x, lb_y, bl_bott, bt, ti, self.name_x, self.name_o)
-        bl_bott.add_widget(ti)
-        bl_bott.add_widget(bt)
+        if self.mode == "pvp":
+            bl_bott.clear_widgets()
+            ti = TextInputer()
+            bt = EnterBt()
+            bt.on_press = partial(self.input_x, fl, lb_x, lb_y, bl_bott, bt, ti, self.name_x, self.name_o)
+            bl_bott.add_widget(ti)
+            bl_bott.add_widget(bt)
         return
 
-    def input_x(self, fl_g, fl, lb_x, lb_y, bl_bott, bt, ti, name_x, name_o):
+    def change_mode(self, bt):
+        if self.mode == "bot":
+            self.mode = "pvp"
+            bt.text = "PLAYER VS PLAYER"
+        elif self.mode == "pvp":
+            self.mode = "bot"
+            bt.text = "BOT VS PLAYER"
+
+
+    def input_x(self, fl, lb_x, lb_y, bl_bott, bt, ti, name_x, name_o):
         self.name_x = ti.text
         ti.text = "O's name"
         RecordPlayers().db_connect(self.name_x, lb_x.score)
         print(self.name_x)
-        bt.on_press = partial(self.input_o, fl_g, fl, lb_x, lb_y, bl_bott, bt, ti, self.name_o)
+        bt.on_press = partial(self.input_o, fl, lb_x, lb_y, bl_bott, bt, ti, self.name_o)
         return
 
-    def input_o(self, fl_g, fl, lb_x, lb_y, bl_bott, bt, ti, name_o):
+    def input_o(self, fl, lb_x, lb_y, bl_bott, bt, ti, name_o):
         self.name_o = ti.text
         RecordPlayers().db_connect(self.name_o, lb_y.score)
         print(self.name_o)
-        bt_cls = BtCls()
-        bt_cls.on_press = partial(self.clear_screen, bl_bott, fl_g, lb_x, lb_y)
         bl_bott.clear_widgets()
+
+        bt_mode = UIBt()
+        bt_mode.text = "BOT VS PLAYER"
+        bt_mode.on_press = partial(self.change_mode, bt_mode)
+
+        bt_cls = UIBt()
+        bt_cls.text = 'END GAME'
+        bt_cls.on_press = partial(self.clear_screen, bl_bott, fl, lb_x, lb_y)
+
+        bl_bott.add_widget(bt_mode)
         bl_bott.add_widget(bt_cls)
         return
 
@@ -258,14 +334,12 @@ class RecordPlayers():
 class TextInputer(TextInput):
     pass
 
-class BtCls(Button):
+
+class UIBt(Button):
     pass
+
 
 class EnterBt(Button):
-    pass
-
-
-class MenuScreen(Screen):
     pass
 
 
@@ -283,7 +357,6 @@ class TickTackToeApp(App):
         self.icon = 'image/icon.png'
         self.title = 'Tic-Tac-Toe'
         return sm
-
 
 if __name__ == "__main__":
     TickTackToeApp().run()
