@@ -2,7 +2,6 @@
 from kivy.app import App
 from kivy.config import Config
 from kivy.graphics import Color, Rectangle
-from kivy.uix.slider import Slider
 from kivy.uix.button import Button
 from kivy.uix.slider import Slider
 from kivy.uix.textinput import TextInput
@@ -285,23 +284,27 @@ class Game(BoxLayout):
         return
 
     def change_field(self, bt, fl, lb_x, lb_y):
+        self.children[1].children[0].clear_widgets()
+        fl.children = []
         fl.cols += 1
         if fl.cols == 7:
             fl.cols = 3
         bt.text = str(fl.cols)
 
-        fl.table.clear()
-        fl.buttons.clear()
-        fl.clear_widgets()
-        
         for x in range(fl.cols):
-            fl.table.append([])
+            #fl.table.append([])
             for y in range(fl.cols):
                 bt = Cell(x, y)
                 bt.on_press = partial(self.callback, bt, fl, lb_x, lb_y)
                 fl.add_widget(bt)
-                fl.table[x].append(None)
-                fl.buttons.append(bt)
+                #fl.table[x].append(None)
+                #fl.buttons.append(bt)
+            
+        
+
+        
+
+        
 
     def change_mode(self, bt):
         if self.mode == "bot":
@@ -362,10 +365,6 @@ class TextInputer(TextInput):
     pass
 
 
-class UISlider(Slider):
-    pass
-    
-
 class UIBt(Button):
     pass
 
@@ -377,10 +376,6 @@ class EnterBt(Button):
 
 
 class GameScreen(Screen):
-    pass
-
-
-class StartScreen(Screen):
     pass
 
 

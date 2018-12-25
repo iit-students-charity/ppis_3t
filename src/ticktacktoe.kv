@@ -1,10 +1,9 @@
 #:kivy 1.8.0
 
 <ScreenManagement>
-    StartScreen:
     GameScreen:
 
-<StartScreen>
+<MenuScreen>
     name: 'ms'
     Button:
         text: 'PLAY'
@@ -13,6 +12,32 @@
         background_color: [.20, .24, .33, 1]
         background_normal: ""
         background_down: ""
+
+<Game>
+    padding: 25
+    orientation: "vertical"
+
+<UISlider>
+    min: 3
+    max: 6
+    value: 3
+    step: 1
+
+<UIBt>
+    background_color: [.20, .24, .33, 1]
+    background_normal: ""
+    background_down: ""
+
+<EnterBt>
+    text: 'SEND'
+    background_color: [.20, .24, .33, 1]
+    background_normal: ""
+    background_down: ""
+
+<TextInputer>
+    text: "X's name"
+    multiline: False
+    background_color: [.40, .44, .53, 1]
 
 <GameScreen>
     name: 'gs'
@@ -30,36 +55,6 @@
                 size: (448, 427)
                 pos: (175, 85)
     Game:
-
-<Game>
-    padding: 25
-    orientation: "vertical"
-
-<UISlider>
-    min: 3
-    max: 6
-    value: 3
-    step: 1
-    value_track: True
-    value_track_color: [.95, .54, .57, 1]
-    cursor_image: 'd://3t/src/image/slider.png'
-    cursor_size: (20, 20)
-
-<UIBt>
-    background_color: [.20, .24, .33, 1]
-    background_normal: ""
-    background_down: ""
-
-<EnterBt>
-    text: 'SEND'
-    background_color: [.20, .24, .33, 1]
-    background_normal: ""
-    background_down: ""
-
-<TextInputer>
-    text: "X's name"
-    multiline: False
-    background_color: [.40, .44, .53, 1]
                 
 <Field>
     size_hint: (.60, .88)
