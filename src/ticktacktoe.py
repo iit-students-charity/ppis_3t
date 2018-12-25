@@ -18,6 +18,7 @@ import random
 
 Config.read('3t.cfg')
 
+
 class Cell(Button):
     pos_x = 0
     pos_y = 0
