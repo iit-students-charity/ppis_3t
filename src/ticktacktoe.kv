@@ -6,13 +6,26 @@
 
 <StartScreen>
     name: 'ms'
-    Button:
-        text: 'PLAY'
-        on_press: root.manager.current = 'gs'
-        font_size: 50
-        background_color: [.20, .24, .33, 1]
-        background_normal: ""
-        background_down: ""
+    Widget:
+        canvas:
+            Color:
+                rgb: (.20, .24, .33)
+            Rectangle:
+                size: (800, 600)
+                pos: (0, 0)
+    BoxLayout:  
+        orientation: 'vertical'
+        Image: 
+            padding: 20
+            source: 'd://3t/src/image/menu_gif.gif'
+            anim_delay: 0.07
+        Button:
+            text: 'PLAY'
+            on_press: root.manager.current = 'gs'
+            font_size: 50
+            background_color: [.20, .24, .33, 1]
+            background_normal: ""
+            background_down: ""
 
 <GameScreen>
     name: 'gs'

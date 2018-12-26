@@ -20,6 +20,7 @@ import mysql.connector
 
 Config.read('3t.cfg')
 
+
 class Cell(Button):
     pos_x = 0
     pos_y = 0
@@ -113,7 +114,7 @@ class ScoreBar(BoxLayout):
 
 class Field(GridLayout):
     switcher = 0
-    cols = 3
+    cols = 2
     table = []
     buttons = []
     wc = WinCond()
@@ -156,14 +157,17 @@ class Game(BoxLayout):
         bl_top.add_widget(al)
 
         bt_field = UIBt()
-        bt_field.text = str(fl_g.cols)
+        bt_field.color = [.40, .52, .63, 1] 
+        bt_field.text = str(fl_g.cols) + 'X' + str(fl_g.cols)
         bt_field.on_press = partial(self.change_field, bt_field, fl_g, lb_x, lb_y)
 
         bt_mode = UIBt()
-        bt_mode.text = "BOT VS PLAYER"
-        bt_mode.on_press = partial(self.change_mode, bt_mode)
+        bt_mode.color = [.40, .52, .63, 1] 
+        bt_mode.text = "PC VS PLAYER"
+        bt_mode.on_press = partial(self.change_mode, bt_mode, lb_x, lb_y)
 
         bt_cls = UIBt()
+        bt_cls.color = [.95, .54, .57, 1]
         bt_cls.text = 'END GAME'
         bt_cls.on_press = partial(self.clear_screen, bl_bott, fl_g, lb_x, lb_y)
 
@@ -288,7 +292,7 @@ class Game(BoxLayout):
         fl.cols += 1
         if fl.cols == 7:
             fl.cols = 3
-        bt.text = str(fl.cols)
+        bt.text = str(fl.cols) + 'X' + str(fl.cols)
 
         fl.table.clear()
         fl.buttons.clear()
@@ -303,13 +307,17 @@ class Game(BoxLayout):
                 fl.table[x].append(None)
                 fl.buttons.append(bt)
 
-    def change_mode(self, bt):
+    def change_mode(self, bt, lb_x, lb_y):
         if self.mode == "bot":
             self.mode = "pvp"
             bt.text = "PLAYER VS PLAYER"
         elif self.mode == "pvp":
             self.mode = "bot"
-            bt.text = "BOT VS PLAYER"
+            bt.text = "PC VS PLAYER"
+        lb_x.text = '0'
+        lb_y.text = '0'
+        lb_x.score = 0
+        lb_y.score = 0
 
 
     def input_x(self, fl, lb_x, lb_y, bl_bott, bt, ti, name_x, name_o):
@@ -326,14 +334,22 @@ class Game(BoxLayout):
         print(self.name_o)
         bl_bott.clear_widgets()
 
+        bt_field = UIBt()
+        bt_field.color = [.40, .52, .63, 1] 
+        bt_field.text = str(fl.cols) + 'X' + str(fl.cols)
+        bt_field.on_press = partial(self.change_field, bt_field, fl, lb_x, lb_y)
+
         bt_mode = UIBt()
+        bt_mode.color = [.40, .52, .63, 1] 
         bt_mode.text = "BOT VS PLAYER"
-        bt_mode.on_press = partial(self.change_mode, bt_mode)
+        bt_mode.on_press = partial(self.change_mode, bt_mode, lb_x, lb_y)
 
         bt_cls = UIBt()
+        bt_cls.color = [.95, .54, .57, 1]
         bt_cls.text = 'END GAME'
         bt_cls.on_press = partial(self.clear_screen, bl_bott, fl, lb_x, lb_y)
 
+        bl_bott.add_widget(bt_field)
         bl_bott.add_widget(bt_mode)
         bl_bott.add_widget(bt_cls)
         return
