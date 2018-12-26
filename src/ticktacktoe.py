@@ -4,6 +4,7 @@ from kivy.config import Config
 from kivy.graphics import Color, Rectangle
 from kivy.uix.slider import Slider
 from kivy.uix.button import Button
+from kivy.uix.slider import Slider
 from kivy.uix.textinput import TextInput
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.widget import Widget
@@ -15,7 +16,7 @@ from kivy.uix.gridlayout import GridLayout
 
 from functools import partial
 import random
-import mysql.connector
+import mysql.connector 
 
 Config.read('3t.cfg')
 
@@ -306,7 +307,6 @@ class Game(BoxLayout):
                 fl.table[x].append(None)
                 fl.buttons.append(bt)
 
-
     def change_mode(self, bt, lb_x, lb_y):
         if self.mode == "bot":
             self.mode = "pvp"
@@ -374,7 +374,6 @@ class RecordPlayers():
 
         print(players.rowcount, "record inserted.")
 
-
 class TextInputer(TextInput):
     pass
 
@@ -386,6 +385,8 @@ class UISlider(Slider):
 class UIBt(Button):
     pass
 
+class UISlider(Slider):
+    pass
 
 class EnterBt(Button):
     pass
